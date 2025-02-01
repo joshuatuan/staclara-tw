@@ -15,7 +15,7 @@ import { Button } from "./ui/button";
 export default function AlertButton({ children }: { children: ReactNode }) {
   return (
     <AlertDialog>
-      <AlertDialogTrigger>
+      <AlertDialogTrigger asChild>
         <Button variant="default">Delete Account</Button>
       </AlertDialogTrigger>
       <AlertDialogContent>

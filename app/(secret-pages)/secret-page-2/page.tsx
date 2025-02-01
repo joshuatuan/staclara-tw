@@ -17,7 +17,7 @@ export default async function Page() {
         <Textarea
           className="w-96 h-20"
           name="message"
-          defaultValue={secretMessage?.message}
+          defaultValue={secretMessage?.message || ""}
           placeholder="Enter message here"
           id="secret-message"
         />

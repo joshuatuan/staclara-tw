@@ -16,7 +16,7 @@ export const getSecretMessage = async () => {
   const { data: secretMessage, error: messageError } = await supabase
     .from("secret_messages")
     .select("message")
-    .eq("user_id", user?.id)
+    .eq("user_id", user!.id)
     .single();
 
   return secretMessage;
@@ -97,8 +97,8 @@ export const getAcceptedFriends = async () => {
         id,
         user_id,
         friend_id,
-        profiles:friend_id (email),
-        profiles2:user_id (email)
+        profiles:user_id (email),
+        profiles2:friend_id (email)
       `
       )
       .or(`user_id.eq.${userId},friend_id.eq.${userId}`)
@@ -111,12 +111,12 @@ export const getAcceptedFriends = async () => {
 
     // Map the results to include the friend's email and ID
     const acceptedFriends = friends.map((friend) => {
-      // Determine which side of the relationship is the friend / bidirectional shit
+      // Determine which side of the relationship is the friend
       const isUserSender = friend.user_id === userId;
       const friendId = isUserSender ? friend.friend_id : friend.user_id;
       const friendEmail = isUserSender
-        ? friend.profiles.email
-        : friend.profiles2.email;
+        ? friend.profiles2.email // Friend's email is in profiles2
+        : friend.profiles.email; // Friend's email is in profiles
 
       return {
         id: friendId,

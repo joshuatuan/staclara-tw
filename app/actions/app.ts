@@ -47,7 +47,7 @@ export const sendFriendRequestAction = async (formData: FormData) => {
   }
 
   try {
-    const { error } = await supabase.from("friends").insert([
+    const { data, error } = await supabase.from("friends").insert([
       {
         user_id: user.id,
         friend_id: friendId,
@@ -56,7 +56,7 @@ export const sendFriendRequestAction = async (formData: FormData) => {
     ]);
 
     if (error) {
-      throw new Error("Error sending friend request");
+      console.log(error.message);
     }
 
     revalidatePath("/secret-page-3");

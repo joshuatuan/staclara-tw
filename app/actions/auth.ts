@@ -9,7 +9,6 @@ export const signUpAction = async (formData: FormData) => {
   const email = formData.get("email")?.toString();
   const password = formData.get("password")?.toString();
   const supabase = await createClient();
-  const origin = (await headers()).get("origin");
 
   if (!email || !password) {
     return encodedRedirect(
@@ -36,7 +35,7 @@ export const signUpAction = async (formData: FormData) => {
     const { error } = await supabase.from("profiles").insert([
       {
         id: data.user!.id,
-        email: data.user!.email,
+        email: data.user!.email as string,
       },
     ]);
     if (error) {

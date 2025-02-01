@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { ChevronRight } from "lucide-react";
 
 import {
   Breadcrumb,
@@ -9,39 +10,33 @@ import {
   BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
-  BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { Slash } from "lucide-react";
+
+const links = [
+  { href: "/", label: "Home" },
+  { href: "/secret-page-2", label: "Secret Message" },
+  { href: "/secret-page-3", label: "Friends" },
+];
 
 export function NavLinks() {
   const pathname = usePathname();
-
-  const links = [
-    { href: "/", label: "Home" },
-    { href: "/secret-page-2", label: "Secret Message" },
-    { href: "/secret-page-3", label: "Friends" },
-  ];
 
   return (
     <Breadcrumb>
       <BreadcrumbList>
         {links.map((link, index) => (
           <BreadcrumbItem key={link.href}>
-            {index > 0 && (
-              <BreadcrumbSeparator>
-                <Slash />
-              </BreadcrumbSeparator>
-            )}
             {pathname === link.href ? (
-              <BreadcrumbPage>
-                <Link href={link.href} className="font-medium">
-                  {link.label}
-                </Link>
+              <BreadcrumbPage className="font-medium">
+                {link.label}
               </BreadcrumbPage>
             ) : (
-              <BreadcrumbLink>
+              <BreadcrumbLink asChild>
                 <Link href={link.href}>{link.label}</Link>
               </BreadcrumbLink>
+            )}
+            {index < links.length - 1 && (
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
             )}
           </BreadcrumbItem>
         ))}
