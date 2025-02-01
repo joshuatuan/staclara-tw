@@ -48,11 +48,11 @@ export const updateSession = async (request: NextRequest) => {
     }
 
     // redirect user to /protected if they are already signed in
-    if (request.nextUrl.pathname === "/") {
-      const user = await supabase.auth.getUser();
-      if (!user.error)
-        return NextResponse.redirect(new URL("/protected", request.url));
-    }
+    // if (request.nextUrl.pathname === "/") {
+    //   const user = await supabase.auth.getUser();
+    //   if (!user.error)
+    //     return NextResponse.redirect(new URL("/protected", request.url));
+    // }
 
     return response;
   } catch (e) {

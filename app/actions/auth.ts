@@ -19,19 +19,33 @@ export const signUpAction = async (formData: FormData) => {
     );
   }
 
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    // options: {
-    //   emailRedirectTo: `${origin}/auth/callback`,
-    // },
   });
 
   if (error) {
+    if (error.code === "user_already_exists") {
+      return encodedRedirect("error", "/sign-up", "User already exists");
+    }
     console.error(error.code + " " + error.message);
     return encodedRedirect("error", "/sign-up", error.message);
   }
-  return redirect("/protected");
+
+  if (data.user) {
+    const { error } = await supabase.from("profiles").insert([
+      {
+        id: data.user!.id,
+        email: data.user!.email,
+      },
+    ]);
+    if (error) {
+      console.error(error.code + " " + error.message);
+      return encodedRedirect("error", "/sign-up", error.message);
+    }
+  }
+
+  return redirect("/");
 };
 
 export const signInAction = async (formData: FormData) => {
@@ -48,7 +62,7 @@ export const signInAction = async (formData: FormData) => {
     return encodedRedirect("error", "/sign-in", error.message);
   }
 
-  return redirect("/protected");
+  return redirect("/");
 };
 
 export const forgotPasswordAction = async (formData: FormData) => {
@@ -126,5 +140,30 @@ export const resetPasswordAction = async (formData: FormData) => {
 export const signOutAction = async () => {
   const supabase = await createClient();
   await supabase.auth.signOut();
-  return redirect("/sign-in");
+  return redirect("/");
+};
+
+export const deleteAccountAction = async () => {
+  // we need to use the service role key to delete the user
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const supabase = await createClient(serviceRoleKey);
+
+  const { data } = await supabase.auth.getUser();
+  const userId = data.user?.id;
+
+  if (userId) {
+    const { error } = await supabase.auth.admin.deleteUser(userId);
+    if (error) {
+      console.error(error.message);
+    }
+
+    await supabase.from("profiles").delete().eq("id", userId);
+    await supabase.from("secret_messages").delete().eq("user_id", userId);
+    await supabase
+      .from("friends")
+      .delete()
+      .or(`user_id.eq.${userId},friend_id.eq.${userId}`);
+  }
+
+  return redirect("/");
 };
